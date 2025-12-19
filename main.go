@@ -31,7 +31,7 @@ func main() {
 			}
 			return
 		}
-		
+
 		// Обработка /api/messages/:id
 		if strings.HasPrefix(r.URL.Path, "/api/messages/") {
 			switch r.Method {
@@ -46,7 +46,7 @@ func main() {
 			}
 			return
 		}
-		
+
 		http.NotFound(w, r)
 	})
 
@@ -58,6 +58,6 @@ func main() {
 
 	fmt.Printf("Сервер запущен на порту %s\n", port)
 	fmt.Printf("API доступно по адресу http://localhost:%s/api/messages\n", port)
-	
+
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
