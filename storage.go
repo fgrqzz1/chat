@@ -34,7 +34,7 @@ func NewStorage() *Storage {
 func (s *Storage) GetAllMessages() []Message {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	// Возвращаем копию слайса
 	result := make([]Message, len(s.messages))
 	copy(result, s.messages)
@@ -45,7 +45,7 @@ func (s *Storage) GetAllMessages() []Message {
 func (s *Storage) GetMessageByID(id int) *Message {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	
+
 	for i := range s.messages {
 		if s.messages[i].ID == id {
 			return &s.messages[i]
@@ -58,24 +58,24 @@ func (s *Storage) GetMessageByID(id int) *Message {
 func (s *Storage) AddMessage(username, text string) Message {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	message := Message{
 		ID:        s.nextID,
 		Username:  username,
 		Text:      text,
 		Timestamp: time.Now(),
 	}
-	
+
 	s.messages = append(s.messages, message)
 	s.nextID++
-	
+
 	// Отправляем сообщение в канал для рассылки через WebSocket
 	select {
 	case s.broadcast <- message:
 	default:
 		// Если канал переполнен, просто пропускаем
 	}
-	
+
 	return message
 }
 
@@ -83,7 +83,7 @@ func (s *Storage) AddMessage(username, text string) Message {
 func (s *Storage) DeleteMessage(id int) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	
+
 	for i := range s.messages {
 		if s.messages[i].ID == id {
 			s.messages = append(s.messages[:i], s.messages[i+1:]...)
@@ -117,23 +117,23 @@ func (s *Storage) handleBroadcast() {
 			clients = append(clients, conn)
 		}
 		s.mu.RUnlock()
-		
+
 		// Сериализуем сообщение в JSON
 		messageJSON, err := json.Marshal(message)
 		if err != nil {
 			continue
 		}
-		
+
 		// Рассылаем всем клиентам
 		for _, conn := range clients {
 			s.mu.RLock()
 			_, exists := s.clients[conn]
 			s.mu.RUnlock()
-			
+
 			if !exists {
 				continue
 			}
-			
+
 			if err := conn.WriteMessage(websocket.TextMessage, messageJSON); err != nil {
 				s.UnregisterClient(conn)
 			}

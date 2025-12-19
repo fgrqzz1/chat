@@ -37,7 +37,7 @@ func (h *Handlers) GetAllMessages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	messages := h.storage.GetAllMessages()
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	json.NewEncoder(w).Encode(messages)
