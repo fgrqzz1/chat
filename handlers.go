@@ -2,10 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/websocket"
 )
+
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		// Разрешаем все источники для разработки
+		return true
+	},
+}
 
 // Handlers содержит обработчики HTTP запросов
 type Handlers struct {
@@ -116,4 +126,39 @@ func (h *Handlers) HandleOptions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.WriteHeader(http.StatusOK)
+}
+
+// HandleWebSocket обрабатывает WebSocket соединения
+func (h *Handlers) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// Обновляем HTTP соединение до WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Printf("Ошибка обновления до WebSocket: %v", err)
+		return
+	}
+	defer conn.Close()
+
+	// Регистрируем клиента
+	h.storage.RegisterClient(conn)
+	defer h.storage.UnregisterClient(conn)
+
+	// Отправляем все существующие сообщения новому клиенту
+	messages := h.storage.GetAllMessages()
+	for _, msg := range messages {
+		if err := conn.WriteJSON(msg); err != nil {
+			log.Printf("Ошибка отправки сообщения: %v", err)
+			return
+		}
+	}
+
+	// Читаем сообщения от клиента (для поддержания соединения)
+	for {
+		_, _, err := conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("Ошибка WebSocket: %v", err)
+			}
+			break
+		}
+	}
 }

@@ -50,6 +50,9 @@ func main() {
 		http.NotFound(w, r)
 	})
 
+	// WebSocket эндпоинт
+	http.HandleFunc("/ws", handlers.HandleWebSocket)
+
 	// Получаем порт из переменной окружения или используем 8080 по умолчанию
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -58,6 +61,7 @@ func main() {
 
 	fmt.Printf("Сервер запущен на порту %s\n", port)
 	fmt.Printf("API доступно по адресу http://localhost:%s/api/messages\n", port)
+	fmt.Printf("WebSocket доступен по адресу ws://localhost:%s/ws\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
