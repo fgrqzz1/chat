@@ -1,10 +1,8 @@
-# Chat Backend
+# Chat 
 
-Простой бэкенд для чата на Go.
+# Backend
 
 ## Установка
-
-Убедитесь, что у вас установлен Go версии 1.19 или выше.
 
 ```bash
 go mod download
@@ -16,14 +14,7 @@ go mod download
 go run .
 ```
 
-Или скомпилируйте и запустите:
-
-```bash
-go build -o chat-backend
-./chat-backend
-```
-
-Сервер запустится на порту 8080 (или на порту, указанном в переменной окружения PORT).
+Сервер запустится на порту 8080
 
 ## API Endpoints
 
@@ -129,7 +120,7 @@ ws.onclose = function() {
 
 ## Технологии
 
-- Go 1.19+
+- Go 1.23+
 - Стандартная библиотека net/http
 - gorilla/websocket для WebSocket поддержки
 
@@ -142,11 +133,10 @@ ws.onclose = function() {
 ## Структура проекта
 
 ```
-.
-├── main.go      # Точка входа приложения
-├── models.go    # Модели данных
-├── storage.go   # Хранилище сообщений
-├── handlers.go  # HTTP обработчики
-└── go.mod       # Зависимости Go
+main.go       Точка входа приложения
+models.go     Модели данных
+storage.go    Хранилище сообщений
+handlers.go   HTTP обработчики
+go.mod        Зависимости Go
 
 ```
