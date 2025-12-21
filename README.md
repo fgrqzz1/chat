@@ -16,6 +16,10 @@
 ```bash
 go mod download
 ```
+если не установлен go
+```bash
+brew install go
+```
 
 2. **Установите зависимости фронтенда:**
 ```bash
