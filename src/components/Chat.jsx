@@ -13,7 +13,7 @@ function Chat() {
   useEffect(() => {
     loadMessages()
     
-    // Обновляем сообщения каждые 2 секунды
+    // Обновляем сообщения каждые 2000 милисекунды
     const interval = setInterval(loadMessages, 2000)
     
     return () => clearInterval(interval)
