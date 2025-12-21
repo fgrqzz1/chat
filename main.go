@@ -9,15 +9,11 @@ import (
 )
 
 func main() {
-	// Создаем хранилище сообщений
 	storage := NewStorage()
 
-	// Создаем обработчики
 	handlers := NewHandlers(storage)
 
-	// Настраиваем маршруты
 	http.HandleFunc("/api/messages", func(w http.ResponseWriter, r *http.Request) {
-		// Проверяем, является ли путь точно /api/messages
 		if r.URL.Path == "/api/messages" {
 			switch r.Method {
 			case http.MethodGet:
@@ -32,7 +28,6 @@ func main() {
 			return
 		}
 
-		// Обработка /api/messages/:id
 		if strings.HasPrefix(r.URL.Path, "/api/messages/") {
 			switch r.Method {
 			case http.MethodGet:
@@ -50,18 +45,23 @@ func main() {
 		http.NotFound(w, r)
 	})
 
-	// WebSocket эндпоинт
 	http.HandleFunc("/ws", handlers.HandleWebSocket)
 
-	// Получаем порт из переменной окружения или используем 8080 по умолчанию
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok"}`))
+	})
+
 	fmt.Printf("Сервер запущен на порту %s\n", port)
 	fmt.Printf("API доступно по адресу http://localhost:%s/api/messages\n", port)
 	fmt.Printf("WebSocket доступен по адресу ws://localhost:%s/ws\n", port)
+	fmt.Printf("Health check: http://localhost:%s/health\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

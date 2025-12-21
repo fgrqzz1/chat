@@ -15,3 +15,5 @@ go.work
 go.work.sum
 /vendor/
 chat-backend
+test-client
+test_client
