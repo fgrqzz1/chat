@@ -21,4 +21,3 @@ function MessageList({ messages, currentUsername }) {
 }
 
 export default MessageList
-

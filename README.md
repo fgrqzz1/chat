@@ -2,191 +2,102 @@
 
 Полнофункциональное приложение чата с бэкендом на Go и фронтендом на React.
 
-## старт
+## Структура проекта
 
-### Предварительные требования
+```
+chat-1/
+├── backend/          # Go-сервер (API, WebSocket)
+│   ├── main.go       # Точка входа
+│   ├── handlers.go   # HTTP-обработчики
+│   ├── models.go     # Модели данных
+│   ├── storage.go    # Хранилище сообщений
+│   ├── go.mod
+│   └── go.sum
+├── frontend/         # React + Vite
+│   ├── src/
+│   │   ├── api/      # API-клиент
+│   │   ├── components/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+├── .github/workflows/ # CI (бэкенд и фронтенд)
+├── package.json      # Корневой: скрипты для запуска всего
+└── README.md
+```
 
-- **Go** версии 1.23
-- **Node.js** версии 16 или выше
+## Старт
+
+### Требования
+
+- **Go** 1.23+
+- **Node.js** 16+
 - **npm**
 
 ### Установка и запуск всего проекта
 
-1. **Установите зависимости бэкенда:**
-```bash
-go mod download
-```
-если не установлен go
-```bash
-brew install go
-```
+1. **Зависимости бэкенда:**
+   ```bash
+   cd backend && go mod download && cd ..
+   ```
+   Если Go не установлен: `brew install go`
 
-2. **Установите зависимости фронтенда:**
-```bash
-npm install
-```
+2. **Зависимости фронтенда и корневые (для `dev:all`):**
+   ```bash
+   npm install
+   cd frontend && npm install && cd ..
+   ```
 
-3. **Запустите оба сервиса одновременно:**
-```bash
-npm run dev:all
-```
+3. **Запуск бэкенда и фронтенда одним скриптом:**
+   ```bash
+   npm run dev:all
+   ```
+   - Бэкенд: `http://localhost:8080`
+   - Фронтенд: `http://localhost:3000`
 
-Этот скрипт запустит:
-- **Бэкенд** на `http://localhost:8080`
-- **Фронтенд** на `http://localhost:3000`
+Откройте в браузере `http://localhost:3000`.
 
-Откройте браузер и перейдите на `http://localhost:3000` для использования чата
+### Запуск по отдельности
 
-### API Endpoints
-
-#### GET /api/messages
-Получить все сообщения.
-
-**Ответ:**
-```json
-[
-  {
-    "id": 1,
-    "username": "user1",
-    "text": "Привет!",
-    "timestamp": "2024-01-01T12:00:00.000Z"
-  }
-]
-```
-
-#### POST /api/messages
-Отправить новое сообщение.
-
-**Тело запроса:**
-```json
-{
-  "username": "user1",
-  "text": "Привет!"
-}
-```
-
-**Ответ:**
-```json
-{
-  "id": 1,
-  "username": "user1",
-  "text": "Привет!",
-  "timestamp": "2024-01-01T12:00:00.000Z"
-}
-```
-
-#### GET /api/messages/:id
-Получить сообщение по ID.
-
-**Ответ:**
-```json
-{
-  "id": 1,
-  "username": "user1",
-  "text": "Привет!",
-  "timestamp": "2024-01-01T12:00:00.000Z"
-}
-```
-
-#### DELETE /api/messages/:id
-Удалить сообщение по ID.
-
-**Ответ:**
-```json
-{
-  "message": "Сообщение удалено"
-}
-```
-
-#### WebSocket /ws
-Подключиться к WebSocket для получения сообщений в реальном времени.
-
-**Подключение:**
-```
-ws://localhost:8080/ws
-```
-
-**Поведение:**
-- При подключении клиент получает все существующие сообщения
-- При создании нового сообщения через POST /api/messages, все подключенные клиенты получают его автоматически
-- Сообщения отправляются в формате JSON
-
-**Пример сообщения:**
-```json
-{
-  "id": 1,
-  "username": "user1",
-  "text": "Привет!",
-  "timestamp": "2024-01-01T12:00:00.000Z"
-}
-```
-
-**Пример использования в JavaScript:**
-```javascript
-const ws = new WebSocket('ws://localhost:8080/ws');
-
-ws.onmessage = function(event) {
-  const message = JSON.parse(event.data);
-  console.log('Новое сообщение:', message);
-};
-
-ws.onerror = function(error) {
-  console.error('WebSocket ошибка:', error);
-};
-
-ws.onclose = function() {
-  console.log('WebSocket соединение закрыто');
-};
-```
-
-### Технологии
-
-- Go 1.23+
-- Стандартная библиотека net/http
-- gorilla/websocket для WebSocket поддержки
-
-### Примечания
-
-- Сообщения хранятся в памяти и будут потеряны при перезапуске сервера
-- WebSocket соединения автоматически закрываются при отключении клиента
-- Новые сообщения автоматически рассылаются всем подключенным клиентам через WebSocket
-
-### Структура проекта
-
-```
-main.go       Точка входа приложения
-models.go     Модели данных
-storage.go    Хранилище сообщений
-handlers.go   HTTP обработчики
-go.mod        Зависимости Go
-```
-
-## Frontend
-
-Простой фронтенд для чата на React.
-
-### Установка
-
-```bash
-npm install
-```
-
-### Запуск
-
-```bash
-npm run dev
-```
-
-Приложение откроется на `http://localhost:3000`
+- Только бэкенд: `npm run dev:backend` или `cd backend && go run .`
+- Только фронтенд: `npm run dev:frontend` или `cd frontend && npm run dev`
 
 ### Сборка
 
-```bash
-npm run build
-```
+- Фронтенд: `npm run build` или `cd frontend && npm run build`
+- Бэкенд: `npm run build:backend` или `cd backend && go build -o chat-backend .`
 
-### Требования
+---
 
-- Node.js 16+
-- npm или yarn
-- Бекенд должен быть запущен на `http://localhost:8080`
+## API
+
+### GET /api/messages
+Получить все сообщения.
+
+### POST /api/messages
+Отправить сообщение. Тело: `{"username": "...", "text": "..."}`.
+
+### GET /api/messages/:id
+Получить сообщение по ID.
+
+### DELETE /api/messages/:id
+Удалить сообщение по ID.
+
+### WebSocket /ws
+Подключение к `ws://localhost:8080/ws` для сообщений в реальном времени. При подключении клиент получает все текущие сообщения; новые рассылаются автоматически.
+
+### Health check
+`GET /health` — ответ `{"status":"ok"}`.
+
+---
+
+## Технологии
+
+- **Бэкенд:** Go 1.23, net/http, gorilla/websocket
+- **Фронтенд:** React 18, Vite 5, axios
+
+## Примечания
+
+- Сообщения хранятся в памяти и теряются при перезапуске сервера.
+- В режиме разработки Vite проксирует `/api` и `/ws` на бэкенд (порт 8080).

@@ -8,9 +8,9 @@ on:
 
 jobs:
   test:
-    name: Тестирование и сборка
+    name: Тестирование и сборка бэкенда
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Получение кода из репозитория
       uses: actions/checkout@v4
@@ -24,17 +24,20 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
         restore-keys: |
           ${{ runner.os }}-go-
 
     - name: Загрузка зависимостей
+      working-directory: backend
       run: go mod download
 
     - name: Статический анализ кода
+      working-directory: backend
       run: go vet ./...
 
     - name: Проверка форматирования кода
+      working-directory: backend
       run: |
         if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
           echo "❌ Код не отформатирован. Запустите 'go fmt ./...'"
@@ -44,7 +47,9 @@ jobs:
         echo "✅ Код правильно отформатирован"
 
     - name: Сборка приложения
+      working-directory: backend
       run: go build -v -o chat-backend .
 
     - name: Запуск тестов
+      working-directory: backend
       run: go test -v ./... || echo "⚠️ Тесты не найдены"

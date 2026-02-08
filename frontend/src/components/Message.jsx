@@ -22,4 +22,3 @@ function Message({ message, isOwn }) {
 }
 
 export default Message
-

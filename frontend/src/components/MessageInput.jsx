@@ -29,4 +29,3 @@ function MessageInput({ onSend }) {
 }
 
 export default MessageInput
-

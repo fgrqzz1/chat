@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8080/api'
+// В режиме разработки Vite проксирует /api на бэкенд
+const API_URL = '/api'
 
 // Получить все сообщения
 export const getMessages = async () => {
@@ -16,4 +17,3 @@ export const sendMessage = async (username, text) => {
   })
   return response.data
 }
-
